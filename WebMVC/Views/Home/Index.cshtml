@@ -1,0 +1,201 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@model List<Concrete.Product>
+
+<form id="productsForm">
+    <div class="products">
+        <div class="container">
+            <div id="messagesShow">
+                @if (Convert.ToBoolean(TempData["EmptyCart"]) == true)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning text-center d-flex align-items-center justify-content-center" role="alert">
+                                <h3>Sepetinizde ürün bulunmamaktadır!</h3>
+                                <p>Ürünlerimizi inceleyebilirsiniz.</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (Convert.ToBoolean(TempData["ProductAdded"]) == true)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-success text-center d-flex align-items-center justify-content-center" role="alert">
+                                <h3>Ürün başarılı bir şekilde eklendi</h3>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Convert.ToBoolean(TempData["OrderCompleted"]) == true)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-success text-center d-flex align-items-center justify-content-center" role="alert">
+                                <h3>Siparişiniz alınmıştır.</h3>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="titlepage">
+                        <h2>ÜRÜNLER</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="our_products">
+                        <div class="row">
+                            @if (Model.Count() > 0)
+                            {
+                                @foreach (Product product in Model)
+                                {
+                                    <div class="col-md-4 margin_bottom1">
+                                        <div class="product_box">
+                                            <h4 class="product-name h4 mb-0">@product.Name</h4>
+                                            <input type="hidden" value="@product.Id" class="product-id" />
+                                            <figure><img src="~/@product.ImageUrl" alt="@product.Name" /></figure>
+                                            <h3 class="btnAddBasket" class="mt-1" data-toggle="modal" data-target="#exampleModalCenter">SEPETE EKLE</h3>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-md-10 offset-1">
+                                    <div class="alert alert-danger" role="alert">
+                                        <h4 class="alert-heading">Stok da ürünümüz bulunmamaktadır!</h4>
+                                        <p>Mevcut durumda ürünümüz yoktur. En kısa sürede eklenecektir. Tekrar bekleriz.</p>
+                                        <h5>Site deneme sürümünde olduğu için aşağıdaki bağlnatıya tıklayarak yönetici olarak ürün ekleyebilirsiz</h5>
+                                        <a class="btn btn-success" asp-area="Admin" asp-controller="Prodcut" asp-action="Add">ÜRÜN EKLE</a>
+                                    </div>
+                                </div>
+
+                            }
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header offset-1 mt-2">
+                                            <div class="row text-center">
+                                                <div class="col-md-12">
+                                                    <div class="alert alert-success ml-5" role="alert">
+                                                        Ürün başarıyla sepetinize eklenmiştir
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-8" id="productName"></div>
+                                                <div class="col-md-4" id="productQuantity"></div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Alışverişe Devam Et</button>
+                                            <button type="button" class="btn btn-primary btnGoCart">Sepete Git</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="sessionClear" data-val="@HttpContextAccessor.HttpContext.">
+    </div>
+</form>
+@section Scripts
+{
+    <script>
+
+        //var products = JSON.parse(localStorage.getItem("prod") || "[]");
+        //var totalQuantity = parseInt(localStorage.getItem("totalQuan") || "0");
+        //if (totalQuantity > 0) {
+        //    $("#cartNumber").html('<span class="badge badge-danger">' + totalQuantity + '</span>');
+        //}
+
+        var products = [];
+        var totalQuantity = 0;
+
+        function sessionSave(model) {
+            $.ajax({
+                type: "POST",
+                url: "/Cart/ClearSetting",
+                data: {
+                    'model': model
+                },
+                success: function (response) {
+                    console.log(response);
+                    if (response.isSuccessful == true) {
+                        window.location.href = response.redirectUrl;
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $(".btnAddBasket").click(function () {
+                console.log($(this));
+                totalQuantity++;
+
+                var productName = $(this).parents("div.product_box").children("h4").text();
+                var productId = $(this).closest('.product_box').find('.product-id').val();
+
+                var duplicateLastQuantity;
+                var badgeCount;
+                var isThere = false;
+
+                if (products.length == 0) {
+                    badgeCount = 1;
+                    var cartAddedProduct = { Id: productId, Quantity: 1 };
+                    products.push(cartAddedProduct);
+                }
+                else {
+                    for (var i = 0; i < products.length; i++) {
+                        if (products[i].Id == productId) {
+                            isThere = true;
+                            var prevQuantity = products[i].Quantity;
+                            badgeCount = prevQuantity + 1;
+                            var updateProduct = { Id: productId, Quantity: badgeCount };
+                            products[i] = updateProduct;
+                        }
+                    }
+
+                    if (isThere == false) {
+                        badgeCount = 1;
+                        var cartAddedProduct = { Id: productId, Quantity: 1 };
+                        products.push(cartAddedProduct);
+                    }
+                }
+
+                $("#productName").html('<h3>' + productName + '</h3>');
+                $("#productQuantity").html('<h4 class="d-inline"><span class="badge badge-success">' + badgeCount + '</span></h4><h4 class="d-inline">&nbsp;&nbsp;adet eklendi</h4> ');
+
+                $("#cartNumber").html('<span class="badge badge-danger">' + totalQuantity + '</span>');
+
+                //localStorage.setItem("prod", JSON.stringify(products));
+                //localStorage.setItem("totalQuan", totalQuantity.toString());
+
+                //var model = JSON.stringify(products);
+                //sessionSave(model);
+
+            });
+
+
+            $("body").on('click', '.btnGoCart', function () {
+                var model = JSON.stringify(products);
+                sessionSave(model);
+            });
+        });
+    </script>
+}

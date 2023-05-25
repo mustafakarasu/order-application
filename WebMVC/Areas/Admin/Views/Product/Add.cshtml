@@ -1,0 +1,43 @@
+﻿@model Entities.DTOs.ProductAddDto
+
+@{
+    ViewData["Title"] = "Ürün Ekle";
+}
+
+<h1>Ürün Ekle</h1>
+<hr />
+@if (ViewBag.ErrorOccur == true)
+{
+    <div class="alert alert-danger" role="alert">
+        <h5 class="alert-heading">Ürün eklerken bir hata meydana geldi!</h5>
+    </div>
+}
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Add" asp-area="Admin" asp-controller="Product" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" type="number" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageUrl" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" accept="image/png, image/jpg, image/jpeg" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="ÜRÜNÜ KAYDET" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

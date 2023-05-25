@@ -1,0 +1,23 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-10 offset-1">
+
+        </div>
+        @if (ViewBag.ProductMessage != null)
+        {
+            <div class="alert alert-success" role="alert">
+                <p>@ViewBag.ProductMessage</p>
+            </div>
+        }
+    <div class="col-md-10 offset-1">
+        <div class="bg-warning pb-3">
+            <h3 class="h3 text-white p-3 text-uppercase">ÜRÜN İŞLEMLERİ</h3>
+            <hr />
+            <div class="p-2">
+                <span class="text-muted mr-4">Ürün eklemek için: </span><a class="btn btn-success" href="/Admin/Product/Add">ÜRÜN EKLE</a>
+            </div>        
+        </div>
+        
+    </div>       
+    </div>
+</div>

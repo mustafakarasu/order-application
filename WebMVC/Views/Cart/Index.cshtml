@@ -1,0 +1,106 @@
+﻿@model OrderCartDto
+
+<form id="orderFormCreate" method="post" class="p-2">
+    <div class="container mt-5 p-3 rounded cart">
+        <div class="row no-gutters">
+            <div class="col-md-8">
+                <div class="product-details mr-2">
+                    <h5 class="mb-0 h5 text-center">Alışveriş Sepetiniz</h5>
+                    <hr />
+                    <div style="height:5px;">
+
+                    </div>
+                    @if (Model != null)
+                    {
+                        int i = 0;
+                        @foreach (ProductCartDto product in Model.Products)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mt-3 p-2 items rounded">
+                                <div class="d-flex flex-row">
+                                    <img class="rounded" src="~/@product.ImageUrl" width="40">
+                                    <input type="hidden" asp-for="Products[i].ImageUrl" />
+                                    <div class="ml-3 d-flex align-items-center"><span class="font-weight-bold d-block">@product.Name</span></div>
+                                    <input type="hidden" asp-for="Products[i].Name" />
+                                    <input type="hidden" asp-for="Products[i].Id" />
+                                </div>
+                                <div class="d-flex flex-row align-items-center">
+                                    <span class="d-block"></span><span class="d-block mr-3 font-weight-bold">@(product.Quantity) Adet</span>
+                                    <input type="hidden" asp-for="Products[i].Quantity" />
+                                </div>
+                                <div class="d-flex flex-row align-items-center">
+                                    <span class="d-block"></span><span class="d-block mr-3 font-weight-bold h6">₺@product.TotalPrice</span>
+                                    <input type="hidden" asp-for="Products[i].TotalPrice" />
+                                    <input type="hidden" asp-for="Products[i].Price" />
+                                </div>
+                            </div>
+                            i++;
+                        }
+                    }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="payment-info">
+                    <div class="d-flex justify-content-center align-items-center bg-danger text-white rounded"><span class="ml-3 mt-1 h5 text-center p-2 rounded">Şiparişi Tamamla</span></div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6 class="h6 text-center text-dark font-weight-bold mb-0">Müşteri Bilgileri</h6>
+                            <div>
+                                <label class="credit-card-label" asp-for="Customer.Name"></label>
+                                <input type="text" class="form-control credit-inputs" asp-for="Customer.Name" placeholder="Adınız">
+                                <span asp-validation-for="Customer.Name" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <label class="credit-card-label" asp-for="Customer.Email"></label>
+                                <input type="email" class="form-control credit-inputs" asp-for="Customer.Email" placeholder="Mail Adresi">
+                                <span asp-validation-for="Customer.Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <div class="row">
+                        <div class="col-md-12 mt-1">
+                            <h6 class="h6 text-center text-dark font-weight-bold mb-0">Adres Bilgileri</h6>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="credit-card-label" asp-for="Address.Country"></label>
+                                    <input type="text" asp-for="Address.Country" class="form-control credit-inputs" placeholder="Ülke">
+                                    <span asp-validation-for="Address.Country" class="text-danger"></span>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="credit-card-label" asp-for="Address.City"></label>
+                                    <input type="text" class="form-control credit-inputs" asp-for="Address.City" placeholder="Şehir">
+                                    <span asp-validation-for="Address.City" class="text-danger"></span>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label class="credit-card-label" asp-for="Address.AddressLine"></label>
+                                    <textarea class="form-control credit-inputs" rows="3" asp-for="Address.AddressLine" placeholder="Adres Detayı"></textarea>
+                                    <span asp-validation-for="Address.AddressLine" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="line">
+                    <div class="d-flex justify-content-between"><span>Toplam Tutar: </span><span class="h6">₺@Model.TotalAmount</span></div>
+                    <input type="hidden" asp-for="TotalAmount" value="@Model.TotalAmount" />
+                    <input type="hidden" asp-for="TotalQuantity" value="@Model.TotalQuantity" />
+                    <button class="btn btn-success btn-block d-flex justify-content-between mt-3 align-items-center p-3" type="submit" id="btnOrderConfirm">
+                        <span class="h5 mb-0">₺@Model.TotalAmount</span>
+                        <span class="h6 mb-0">Siparişi Onayla&nbsp;&nbsp;<span class="h4"><i class="fa fa-check-circle-o" aria-hidden="true"></i></span></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@section Styles
+{
+    <link href="~/css/order-cart.css" rel="stylesheet" />
+}
